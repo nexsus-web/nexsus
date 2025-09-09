@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>APK BUG NEXSUS</title>
+<style>
+  body { font-family: Arial, sans-serif; background: url('https://files.catbox.moe/mp9vqc.jpg') no-repeat center center fixed; background-size: cover; color: white; margin:0; padding:0; overflow-x:hidden;}
+  h1 { font-size:70px; text-align:center; margin-top:40px; text-shadow:4px 4px 12px #000;}
+  .developer { text-align:center; font-size:25px; margin-top:-20px; margin-bottom:40px; color:#ffcc00; text-shadow:2px 2px 6px #000;}
+  .login-box, #mainContent, #adminPanel, #profileModal, #settingsModal { max-width:700px; margin:40px auto; text-align:center;}
+  input[type="text"], input[type="password"] { padding:20px; font-size:30px; width:90%; border-radius:15px; border:none; margin-bottom:30px; text-align:center; box-shadow:0 0 15px #000;}
+  button { padding:20px 50px; font-size:35px; font-weight:bold; border:none; border-radius:15px; background-color:#1e90ff; color:white; cursor:pointer; margin:10px; box-shadow:4px 4px 12px #000; transition:0.3s;}
+  button:hover { background-color:#005bb5; transform:scale(1.05);}
+  .hidden { display:none;}
+  #menuBtn { position:fixed; top:20px; right:20px; font-size:35px; cursor:pointer; z-index:1001;}
+  #sideMenu { position:fixed; left:-300px; top:0; width:300px; height:100%; background:rgba(0,0,0,0.9); padding:50px 20px; transition:left 0.4s ease-in-out; z-index:1000;}
+  #sideMenu a { display:block; font-size:25px; color:white; margin:25px 0; text-decoration:none; text-align:left;}
+  #sideMenu a:hover { color:lime; }
+  #status { font-size:30px; margin-top:30px; }
+  .modal { position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:2000; }
+  .modal-content { background:#111; padding:30px; border-radius:20px; max-width:500px; width:90%; text-align:center; }
+  .modal-content input { width:80%; margin-bottom:20px; }
+  @media (max-width:600px){ h1{font-size:50px; margin-top:30px;} .developer{font-size:18px; margin-bottom:30px;} input[type="text"], input[type="password"]{font-size:20px;padding:15px;} button{font-size:25px; padding:15px 30px;} #status{font-size:20px;} #sideMenu{width:250px; padding:40px 15px;} }
+</style>
+</head>
+<body>
+
+<h1>APK BUG NEXSUS</h1>
+<div class="developer">Developer: Arya</div>
+
+<div id="menuBtn" onclick="toggleMenu()">☰</div>
+<div id="sideMenu">
+  <a href="#" onclick="openProfile()">Profil</a>
+  <a href="#" onclick="openSettings()">Pengaturan</a>
+  <a href="#" onclick="openAdminPanel()">Admin Panel</a>
+  <a href="#" onclick="logout()">Logout</a>
+</div>
+
+<div class="login-box" id="loginBox">
+  <input type="text" id="username" placeholder="Username"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button onclick="login()">LOGIN</button>
+</div>
+
+<div id="mainContent" class="hidden">
+  <input type="text" id="nomor" placeholder="Masukkan Nomor Target"><br>
+  <div class="button-group">
+    <button onclick="kirimKeBot('FORCE')">FORCE</button>
+    <button onclick="kirimKeBot('DELAY')">DELAY</button>
+    <button onclick="kirimKeBot('INVIS')">INVIS</button>
+  </div>
+  <div id="status"></div>
+</div>
+
+<!-- Admin Panel -->
+<div id="adminPanel" class="modal">
+  <div class="modal-content">
+    <h2>Admin Panel</h2>
+    <input type="text" id="newUser" placeholder="Username Baru"><br>
+    <input type="password" id="newPass" placeholder="Password Baru"><br>
+    <input type="text" id="newEmoji" placeholder="Emoji"><br>
+    <button onclick="createUser()">Buat Akun</button>
+    <button onclick="closeAdminPanel()">Tutup</button>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div id="profileModal" class="modal">
+  <div class="modal-content">
+    <h2>Profil</h2>
+    <img id="profilePP" src="https://via.placeholder.com/100" style="border-radius:50%;"><br>
+    <span id="profileUsername">Username</span> <span id="profileEmoji">😀</span><br>
+    <button onclick="closeProfile()">Tutup</button>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content">
+    <h2>Pengaturan</h2>
+    <input type="password" id="newPassword" placeholder="Ganti Password"><br>
+    <button onclick="changePassword()">Simpan</button>
+    <button onclick="closeSettings()">Tutup</button>
+  </div>
+</div>
+
+<script src="users.js"></script>
+<script>
+let currentUser = null;
+const sideMenu = document.getElementById('sideMenu');
+
+function toggleMenu(){ sideMenu.style.left = sideMenu.style.left==='0px'?'-300px':'0px'; }
+
+function login(){
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+  const found = findUser(user, pass);
+  if(found){
+    currentUser = found;
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("mainContent").classList.remove("hidden");
+    toggleMenu();
+    alert("Login berhasil! Selamat datang "+currentUser.username);
+  } else { alert("Login gagal! Username atau password salah."); }
+}
+
+function logout(){
+  currentUser=null;
+  document.getElementById("mainContent").classList.add("hidden");
+  document.getElementById("loginBox").style.display="block";
+  sideMenu.style.left='-300px';
+}
+
+function kirimKeBot(mode){
+  if(!currentUser){ alert("Login dulu!"); return; }
+  const nomor=document.getElementById("nomor").value;
+  const status=document.getElementById("status");
+  if(!nomor){ alert("Masukkan nomor!"); return; }
+
+  const API_URL = "https://panelmu.com/api/send"; // ganti sesuai SC/Pterodactyl
+  const API_KEY = "API_KEY_MU"; // optional
+
+  status.innerText="⌛ Mengirim ke bot...";
+  status.style.color="yellow";
+
+  fetch(API_URL,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+API_KEY },
+    body: JSON.stringify({ nomor, mode })
+  })
+  .then(res=>res.json())
+  .then(res=>{
+    status.innerText=res.success?"✅ Berhasil dikirim ke bot!":"❌ Gagal: "+(res.error||"unknown");
+    status.style.color=res.success?"lime":"red";
+  })
+  .catch(err=>{
+    status.innerText="❌ Gagal mengirim ke bot!";
+    status.style.color="red";
+  });
+}
+
+// Admin Panel
+function openAdminPanel(){ if(currentUser && currentUser.role==="admin") document.getElementById("adminPanel").style.display="flex"; else alert("Hanya admin yang bisa akses!"); }
+function closeAdminPanel(){ document.getElementById("adminPanel").style.display="none"; }
+function createUser(){
+  const u=document.getElementById("newUser").value;
+  const p=document.getElementById("newPass").value;
+  const e=document.getElementById("newEmoji").value||"🙂";
+  if(!u||!p){ alert("Isi username & password!"); return; }
+  addUser(u,p,e);
+  alert("Akun berhasil dibuat: "+u);
+  document.getElementById("newUser").value="";
+  document.getElementById("newPass").value="";
+  document.getElementById("newEmoji").value="";
+}
+
+// Profile
+function openProfile(){
+  if(!currentUser){ alert("Login dulu!"); return; }
+  document.getElementById("profileUsername").innerText=currentUser.username;
+  document.getElementById("profileEmoji").innerText=currentUser.emoji;
+  document.getElementById("profilePP").src=currentUser.pp;
+  document.getElementById("profileModal").style.display="flex";
+}
+function closeProfile(){ document.getElementById("profileModal").style.display="none"; }
+
+// Settings
+function openSettings(){ if(!currentUser){ alert("Login dulu!"); return; } document.getElementById("settingsModal").style.display="flex"; }
+function closeSettings(){ document.getElementById("settingsModal").style.display="none"; }
+function changePassword(){
+  const np=document.getElementById("newPassword").value;
+  if(!np){ alert("Masukkan password baru!"); return; }
+  currentUser.password=np
