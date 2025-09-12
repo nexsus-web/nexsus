@@ -1,2 +1,1 @@
-# nexsus
-bug is real
+#nexsus-ai
